@@ -1,0 +1,106 @@
+=== Таблица лексем ===
+Строка  Поз.    Имя             Класс           Значение
+2       1       int             Int int
+2       5       x               Ident x
+2       6       ;               Semicolon ;
+3       1       int             Int int
+3       5       sum             Ident sum
+3       8       ;               Semicolon ;
+5       1       x               Ident x
+5       3       =               Assign =
+5       5       1               Number 1
+5       6       ;               Semicolon ;
+6       1       sum             Ident sum
+6       5       =               Assign =
+6       7       0               Number 0
+6       8       ;               Semicolon ;
+8       1       while           While while
+8       7       (               LParen (
+8       8       x               Ident x
+8       10      <=              Le <=
+8       13      10              Number 10
+8       15      )               RParen )
+8       17      {               LBrace {
+9       5       sum             Ident sum
+9       9       =               Assign =
+9       11      sum             Ident sum
+9       15      +               Plus +
+9       17      x               Ident x
+9       18      ;               Semicolon ;
+10      5       x               Ident x
+10      7       =               Assign =
+10      9       x               Ident x
+10      11      +               Plus +
+10      13      1               Number 1
+10      14      ;               Semicolon ;
+11      1       }               RBrace }
+13      1       print           Print print
+13      7       sum             Ident sum
+13      10      ;               Semicolon ;
+
+=== IR до оптимизации ===
+000: DECLARE x
+001: DECLARE sum
+002: x = 1
+003: sum = 0
+004: LABEL L1
+005: t1 = x <= 10
+006: IF_FALSE t1 GOTO L2
+007: t2 = sum + x
+008: sum = t2
+009: t3 = x + 1
+010: x = t3
+011: GOTO L1
+012: LABEL L2
+013: PRINT sum
+
+=== IR после оптимизации ===
+000: DECLARE x
+001: DECLARE sum
+002: x = 1
+003: sum = 0
+004: LABEL L1
+005: t1 = x <= 10
+006: IF_FALSE t1 GOTO L2
+007: t2 = sum + x
+008: sum = t2
+009: t3 = x + 1
+010: x = t3
+011: GOTO L1
+012: LABEL L2
+013: PRINT sum
+
+=== Код x86 ===
+section .text
+global _start
+_start:
+    ; variable x
+    ; variable sum
+    mov eax, 1
+    mov x, eax
+    mov eax, 0
+    mov sum, eax
+L1:
+    mov eax, x
+    cmp eax, 10
+    setle al
+    movzx eax, al
+    mov t1, eax
+    cmp t1, 0
+    je L2
+    mov eax, sum
+    add eax, x
+    mov t2, eax
+    mov eax, t2
+    mov sum, eax
+    mov eax, x
+    add eax, 1
+    mov t3, eax
+    mov eax, t3
+    mov x, eax
+    jmp L1
+L2:
+    ; print sum
+    mov eax, 1
+    xor ebx, ebx
+    int 0x80
