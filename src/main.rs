@@ -265,10 +265,15 @@ fn main(){
             }
         }
 
-        // Проверяем синтаксис и использование переменных.
-        let mut p=Parser::new(tokens);
-        let ast=p.parse()?;
-        semantic(&ast,&mut HashSet::new())?;
+        let mut p = Parser::new(tokens);
+        let ast = p.parse()?;
+        semantic(&ast, &mut HashSet::new())?;
+
+        // Записываем синтаксическое дерево в отчет.
+        report.push_str("\n=== Синтаксическое дерево (AST) ===\n");
+        for node in &ast {
+            report.push_str(&format!("{:#?}\n", node));
+        }
 
         // Получаем IR и затем оптимизирум его.
         let mut g=Gen::new();

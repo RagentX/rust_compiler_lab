@@ -38,6 +38,68 @@
 13      7       sum             Ident sum
 13      10      ;               Semicolon ;
 
+=== Синтаксическое дерево (AST) ===
+Decl(
+    "x",
+)
+Decl(
+    "sum",
+)
+Assign(
+    "x",
+    Num(
+        1,
+    ),
+)
+Assign(
+    "sum",
+    Num(
+        0,
+    ),
+)
+While(
+    Bin(
+        Id(
+            "x",
+        ),
+        "<=",
+        Num(
+            10,
+        ),
+    ),
+    [
+        Assign(
+            "sum",
+            Bin(
+                Id(
+                    "sum",
+                ),
+                "+",
+                Id(
+                    "x",
+                ),
+            ),
+        ),
+        Assign(
+            "x",
+            Bin(
+                Id(
+                    "x",
+                ),
+                "+",
+                Num(
+                    1,
+                ),
+            ),
+        ),
+    ],
+)
+Print(
+    Id(
+        "sum",
+    ),
+)
+
 === IR до оптимизации ===
 000: DECLARE x
 001: DECLARE sum
